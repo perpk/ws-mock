@@ -1,8 +1,8 @@
-import WebSocket, { WebSocketServer } from 'ws';
-import express, { Express, Request, Response } from 'express';
-import http from 'http';
-import _ from 'lodash';
-import CacheManager from './cache/CacheManager';
+import WebSocket, { WebSocketServer } from 'ws'
+import express, { Express, Request, Response } from 'express'
+import http from 'http'
+import _ from 'lodash'
+import CacheManager from './cache/CacheManager'
 
 const app: Express = express()
 const server = http.createServer()
@@ -10,9 +10,10 @@ const server = http.createServer()
 app.use(express.json())
 const wsServer: WebSocketServer = new WebSocket.Server({ server: server })
 
-wsServer.on('connection', (ws, _) => {
+wsServer.on('connection', (ws, message) => {
   console.log('A new client connected')
   ws.send('ACK')
+  ws['path'] = message.url
 
   ws.on('message', (message) => {
     console.log(`received ${message}`)
@@ -20,7 +21,7 @@ wsServer.on('connection', (ws, _) => {
 })
 
 const emptyBodyResponse = (res: Response): void => {
-  res.status(400).json({ error: 'Request body was empty' }).send();
+  res.status(400).json({ error: 'Request body was empty' }).send()
 }
 
 app.post('/__config/mapping', (req: Request, res: Response) => {
@@ -32,11 +33,15 @@ app.post('/__config/mapping', (req: Request, res: Response) => {
   try {
     mapping = req.body
   } catch (error) {
-    res.status(409).json({ error: error.message }).send();
+    res.status(409).json({ error: error.message }).send()
   }
 
-  CacheManager.createEntry(mapping);
-  res.status(204).send();
+  CacheManager.createEntry(mapping)
+  res.status(204).send()
+})
+
+app.get('/__config/mappings', (_, res: Response) => {
+  res.status(200).json(CacheManager.getAllEntries()).send()
 })
 
 app.post('/__config/trigger', (req: Request, res: Response) => {
@@ -53,14 +58,18 @@ app.post('/__config/trigger', (req: Request, res: Response) => {
   if (entry === null) {
     return res
       .status(404)
-      .json({ error: `No mapping found for ${trigger.path}!` }).send();
+      .json({ error: `No mapping found for ${trigger.path}!` })
+      .send()
   }
   wsServer.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
+    if (
+      client.readyState === WebSocket.OPEN &&
+      client['path'] === trigger.path
+    ) {
       client.send(JSON.stringify(entry))
     }
   })
-  res.status(204).send();
+  res.status(204).send()
 })
 
 server.listen(1234, () => {
