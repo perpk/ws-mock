@@ -1,0 +1,3 @@
+interface Trigger {
+    path: string;
+}
