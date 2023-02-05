@@ -3,6 +3,9 @@ import express, { Express, Request, Response } from 'express'
 import http from 'http'
 import _ from 'lodash'
 import CacheManager from './cache/CacheManager'
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const app: Express = express()
 const server = http.createServer()
@@ -61,21 +64,26 @@ app.post('/__config/trigger', (req: Request, res: Response) => {
       .json({ error: `No mapping found for ${trigger.path}!` })
       .send()
   }
+  let atLeastOneClientAvailable = false;
   wsServer.clients.forEach((client) => {
     if (
       client.readyState === WebSocket.OPEN &&
       client['path'] === trigger.path
     ) {
-      client.send(JSON.stringify(entry))
+      client.send(JSON.stringify(entry));
+      atLeastOneClientAvailable = true;
     }
   })
+  if (atLeastOneClientAvailable === false) {
+    res.status(404).json({ error: `No clients subscribed for path ${trigger.path}`});
+  }
   res.status(204).send()
 })
 
-server.listen(1234, () => {
-  console.log('Running WS Server...')
+server.listen(process.env.WEBSOCKET_PORT, () => {
+  console.log(`Running WS Server on port ${process.env.WEBSOCKET_PORT}`)
 })
 
-app.listen(8888, () => {
-  console.log('Running HTTP Server for config...')
+app.listen(process.env.HTTP_PORT, () => {
+  console.log(`Running HTTP Server for config on port ${process.env.HTTP_PORT}`)
 })
