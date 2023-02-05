@@ -4,6 +4,9 @@ import http from 'http'
 import _ from 'lodash'
 import CacheManager from './cache/CacheManager'
 import * as dotenv from 'dotenv';
+import parseArgs from 'minimist';
+
+const argv = parseArgs(process.argv.slice(2));
 
 dotenv.config();
 
@@ -80,10 +83,25 @@ app.post('/__config/trigger', (req: Request, res: Response) => {
   res.status(204).send()
 })
 
-server.listen(process.env.WEBSOCKET_PORT, () => {
-  console.log(`Running WS Server on port ${process.env.WEBSOCKET_PORT}`)
+server.listen(getConfedPorts().websocketPort, () => {
+  console.log(`Running WS Server on port ${getConfedPorts().websocketPort}`)
 })
 
-app.listen(process.env.HTTP_PORT, () => {
-  console.log(`Running HTTP Server for config on port ${process.env.HTTP_PORT}`)
+app.listen(getConfedPorts().httpPort, () => {
+  console.log(`Running HTTP Server for config on port ${getConfedPorts().httpPort}`)
 })
+
+function getConfedPorts() {
+  let httpPort = process.env.HTTP_PORT;
+  if (argv.httpPort) {
+    httpPort = argv.httpPort;
+  }
+  let websocketPort = process.env.WEBSOCKET_PORT;
+  if (argv.websocketPort) {
+    websocketPort = argv.websocketPort;
+  }
+  return {
+    httpPort,
+    websocketPort
+  };
+}
