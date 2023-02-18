@@ -1,4 +1,6 @@
 import NodeCache from 'node-cache';
+import Mapping from '../domain/mapping/Mapping';
+import MappingValidator from '../domain/mapping/MappingValidator';
 
 class CacheManager {
   private cache: NodeCache
@@ -8,6 +10,7 @@ class CacheManager {
   }
 
   public createEntry(mapping: Mapping): void {
+    MappingValidator.validate(mapping);
     this.cache.set(mapping.path, mapping.response)
   }
 
