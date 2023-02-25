@@ -1,3 +1,3 @@
-interface Trigger {
+export default interface Trigger {
     path: string;
 }

@@ -1,6 +1,7 @@
 import NodeCache from 'node-cache';
 import Mapping from '../domain/mapping/Mapping';
 import MappingValidator from '../domain/mapping/MappingValidator';
+import CacheEntryNotFoundException from './CacheEntryNotFoundException';
 
 class CacheManager {
   private cache: NodeCache
@@ -17,7 +18,7 @@ class CacheManager {
   public getEntry(key: string): object | null {
     const entry: object = this.cache.get(key)
     if (!entry) {
-      return null
+      throw new CacheEntryNotFoundException(`No Cache entry found for key ${key}.`)
     }
     return entry
   }
@@ -29,6 +30,10 @@ class CacheManager {
       mappings.push({ path: key, response: this.cache.get(key) })
     }
     return mappings
+  }
+
+  public removeAll(): void {
+    this.cache.del(this.cache.keys());
   }
 }
 
