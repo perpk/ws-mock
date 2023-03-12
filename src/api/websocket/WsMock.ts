@@ -84,8 +84,8 @@ export default class WsMock {
   /**
    * ! It could be good for something, figure out what :P
    */
-  public executeOnConnection(callback: Function): WsMock {
-    callback()
-    return this
-  }
+  // public executeOnConnection(callback: Function): WsMock {
+  //   callback()
+  //   return this
+  // }
 }

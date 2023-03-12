@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { Request, Response } from 'express'
 import CacheManager from '../../../cache/CacheManager'
 import WsMock from '../../websocket/WsMock'
+import Trigger from '../../../domain/trigger/Trigger'
 
 function triggerWebSocketServer(webSocketServer: WsMock) {
   return (req: Request, res: Response) => {
