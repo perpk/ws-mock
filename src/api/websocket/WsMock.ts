@@ -1,20 +1,22 @@
-import http, { Server } from 'http'
+import http, { Server as HttpServer } from 'http'
 import WebSocket, { WebSocketServer } from 'ws'
 import CacheManager from '../../cache/CacheManager'
 import Mapping from '../../domain/mapping/Mapping'
 import Trigger from '../../domain/trigger/Trigger'
 import Log from '../../utils/logging/Log'
 
+const { Server } = WebSocket
+
 export default class WsMock {
   private static _instance: WsMock = null
 
-  private static _webSocketServer: WebSocketServer = null
+  private _webSocketServer: WebSocketServer = null
 
-  private _server: Server
+  private _server: HttpServer
 
   private _wsPort: number
 
-  private _log = Log.getLogger(WsMock.name);
+  private _log = Log.getLogger(WsMock.name)
 
   private constructor(wsPort: number) {
     this._server = http.createServer()
@@ -29,8 +31,8 @@ export default class WsMock {
   }
 
   public create(): WsMock {
-    if (WsMock._webSocketServer === null) {
-      WsMock._webSocketServer = new WebSocket.Server({ server: this._server })
+    if (this._webSocketServer === null) {
+      this._webSocketServer = new Server({ server: this._server })
     }
     return this
   }
@@ -65,7 +67,7 @@ export default class WsMock {
   public triggerWsServer(trigger: Trigger): WsMock {
     const entry = CacheManager.getEntry(trigger.path)
     let atLeastOneClientAvailable = false
-    WsMock._webSocketServer.clients.forEach((client) => {
+    this._webSocketServer.clients.forEach((client) => {
       if (
         client.readyState === WebSocket.OPEN &&
         client['path'] === trigger.path
@@ -74,11 +76,11 @@ export default class WsMock {
         client.send(JSON.stringify(entry))
         atLeastOneClientAvailable = true
       }
-    });
+    })
     if (!atLeastOneClientAvailable) {
       this._log.warn(`No clients subscribed for path ${trigger.path}.`)
     }
-    return this;
+    return this
   }
 
   /**
