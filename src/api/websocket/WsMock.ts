@@ -33,6 +33,14 @@ export default class WsMock {
   public create(): WsMock {
     if (this._webSocketServer === null) {
       this._webSocketServer = new Server({ server: this._server })
+      this._webSocketServer.on('connection', (connection, message) => {
+        this._log.info('Client connected')
+        connection.path = message.url
+        connection.on('error', console.error)
+        connection.on('open', () => {
+          this._log.info('Socket opened')
+        })
+      })
     }
     return this
   }
