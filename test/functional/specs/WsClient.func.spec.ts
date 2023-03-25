@@ -12,6 +12,7 @@ jest.deepUnmock('bunyan')
 
 describe('A WebSocket Client uses the Mock Server', () => {
   let wsMock = null
+  let wsClient = null
 
   beforeEach(() => {
     wsMock = WsMock.instance(WS_MOCK_PORT).create().start()
@@ -22,13 +23,16 @@ describe('A WebSocket Client uses the Mock Server', () => {
     if (wsMock !== null) {
       wsMock.stop()
     }
+    if (wsClient !== null) {
+      wsClient.close()
+    }
   })
 
   test(
     'The client can connect and receive notifications',
     async () => {
-      const wsClient = new WebSocket(`ws://localhost:${WS_MOCK_PORT}/test/123`)
-
+      wsClient = new WebSocket(`ws://localhost:${WS_MOCK_PORT}/test/123`)
+      
       const textToTest = "Hey, how y'all doin'?"
       let receivedMessage = null
       
