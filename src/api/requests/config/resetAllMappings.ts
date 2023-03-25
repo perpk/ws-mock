@@ -1,8 +1,9 @@
 import { Response } from 'express'
 import CacheManager from '../../../cache/CacheManager'
 
-export default function getMappings() {
+export default function resetAllMappings() {
   return (_, res: Response) => {
-    res.status(200).json(JSON.stringify(CacheManager.getAllEntries())).send()
+    CacheManager.removeAll()
+    res.status(204).send()
   }
 }

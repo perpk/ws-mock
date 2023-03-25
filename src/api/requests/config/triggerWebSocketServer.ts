@@ -4,7 +4,7 @@ import CacheManager from '../../../cache/CacheManager'
 import WsMock from '../../websocket/WsMock'
 import Trigger from '../../../domain/trigger/Trigger'
 
-function triggerWebSocketServer(webSocketServer: WsMock) {
+export default function triggerWebSocketServer(webSocketServer: WsMock) {
   return (req: Request, res: Response) => {
     if (_.isEmpty(req.body)) {
         res.status(400).json({ error: 'Request body was empty' }).send()
