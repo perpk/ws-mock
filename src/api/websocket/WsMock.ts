@@ -81,7 +81,11 @@ export default class WsMock {
         client['path'] === trigger.path
       ) {
         this._log.debug('Sending to client')
-        client.send(JSON.stringify(entry))
+        if (Array.isArray(entry)) {
+          entry.map((e) => client.send(JSON.stringify(e)))
+        } else {
+          client.send(JSON.stringify(entry))
+        }
         atLeastOneClientAvailable = true
       }
     })

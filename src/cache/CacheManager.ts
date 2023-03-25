@@ -12,7 +12,12 @@ class CacheManager {
 
   public createEntry(mapping: Mapping): void {
     MappingValidator.validate(mapping);
-    this.cache.set(mapping.path, mapping.response)
+    if (this.cache.has(mapping.path)) {
+      const multiple = [mapping.response, this.cache.get(mapping.path)]
+      this.cache.set(mapping.path, multiple)
+    } else {
+      this.cache.set(mapping.path, mapping.response)
+    }
   }
 
   public getEntry(key: string): object | null {
