@@ -1,7 +1,10 @@
 const express = jest.fn(() => {
   return {
     use,
-    listen
+    listen,
+    post: jest.fn(() => {}),
+    get: jest.fn(() => {}),
+    delete: jest.fn(() => {})
   }
 })
 

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:watchAll": "jest --watchAll",
-    "test:coverage": "jest --coverage",
+    "test:watchAll": "jest --watchAll --testPathPattern=src",
+    "test:coverage": "jest --coverage --testPathPattern=src",
     "test:functional": "jest --testPathPattern=test/functional/specs",
     "test:functional:watchAll": "jest --testPathPattern=test/functional/specs --watchAll",
     "ts-build": "npx tsc"
